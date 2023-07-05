@@ -25,6 +25,7 @@ const run = async () => {
     const octokit = github.getOctokit(token);
     const branchName = core.getInput("new_branch");
     const context = github.context;
+    core.info("Branch name:", branchName);
 
     core.info("Creating or Replacing branch...");
     await branch.createOrReplace(octokit, context, branchName);
