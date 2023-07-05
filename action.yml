@@ -20,11 +20,11 @@ inputs:
   commit_message: 
     description: 'Provide a commit message for the gem version bump.'
     required: false
-    default: 'Updated gem version'
+    default: 'Updated product version'
   pr_title:
     description: 'Provide a title for the PR.'
     required: false
-    default: 'Updated gem version'
+    default: 'Updated product version'
   pr_body:
     description: 'Provide a body for the PR.'
     required: false
