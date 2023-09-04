@@ -42,7 +42,8 @@ const createOrReplace = async (octokit, context, branchName) => {
   try {
     core.debug(`Creating branch ${branchName}`);
     let isBranchCreated = await create(octokit, context, branchName);
-
+    core.debug("UDAI");
+    core.debug(isBranchCreated);
     core.debug("Branch created:", Boolean(isBranchCreated));
     if (!Boolean(isBranchCreated)) {
       core.debug("Deleting the existing branch...");
