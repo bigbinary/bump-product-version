@@ -17,7 +17,11 @@ const create = async (octokit, context, branch) => {
         ...context.repo,
       });
 
-      return response?.data?.ref === reference;
+      if(response?.data?.ref === reference) {
+        return true
+      } else {
+        throw Error(response)
+      }
     } else {
       throw Error(error);
     }
