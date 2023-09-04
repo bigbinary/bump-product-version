@@ -30,7 +30,7 @@ const create = async (octokit, context, branchName) => {
 
   try {
 
-    core.info(`Context: ${context.repo}`);
+    core.info(`Context: ${JSON.stringify(context.repo)}`);
     core.info(`BranchName: ${branchName}`);
     
     const branch = await octokit.rest.repos.getBranch({
@@ -38,7 +38,7 @@ const create = async (octokit, context, branchName) => {
       branch: branchName,
     });
 
-    core.info(`Branch: ${branch}`);
+    core.info(`Branch: ${JSON.stringify(branch)}`);
 
     const branchSha = branch.data.commit.sha;
 

@@ -16,6 +16,7 @@ const create = async (octokit, context, branch) => {
         sha: context.sha,
         ...context.repo,
       });
+      core.info(`Response: ${JSON.stringify(response)}`);
 
       if(response?.data?.ref === reference) {
         return true
