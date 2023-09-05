@@ -18,14 +18,12 @@ const run = async () => {
     const context = github.context;
 
     core.info("Creating or Replacing branch...");
-    let res = await branch.createOrReplace(octokit, context, branchName);
-    core.info(`BRANCH RESPONSE: ${JSON.stringify(res)}`);
+    await branch.createOrReplace(octokit, context, branchName);
+    wait(50);
     
     core.info("Creating a commit...");
-    core.debug(context);
-    core.debug(branchName);
-    let res2 = await commit.create(octokit, context, branchName);
-    core.info(`COMMIT RESPONSE: ${JSON.stringify(res2)}`);
+    await commit.create(octokit, context, branchName);
+    wait(50);
 
     core.info("Creating a PR...");
     const prNumber = await pr.create(octokit, context, branchName);

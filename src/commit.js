@@ -29,23 +29,19 @@ const create = async (octokit, context, branchName) => {
   const commitMessage = core.getInput("commit_message");
 
   try {
-
-    core.info(`Context: ${JSON.stringify(context.repo)}`);
-    core.info(`BranchName: ${branchName}`);
-    
     const branch = await octokit.rest.repos.getBranch({
       ...context.repo,
       branch: branchName,
     });
-
-    core.info(`Branch: ${JSON.stringify(branch)}`);
-
+    core.info(`Get branch response: ${JSON.stringify(branch)}`);
+    
     const branchSha = branch.data.commit.sha;
-
+    
     const commits = await octokit.rest.repos.listCommits({
       ...context.repo,
       sha: branchSha,
     });
+    core.info(`Get commits response: ${JSON.stringify(commits)}`);
 
     const commitSHA = commits.data[0].sha;
 
