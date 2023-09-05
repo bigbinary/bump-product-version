@@ -36,7 +36,7 @@ const create = async (octokit, context, branchName) => {
     core.info(`Get branch response: ${JSON.stringify(branch)}`);
     
     const branchSha = branch.data.commit.sha;
-    
+
     const commits = await octokit.rest.repos.listCommits({
       ...context.repo,
       sha: branchSha,

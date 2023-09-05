@@ -18,7 +18,7 @@ const create = async (octokit, context, branch) => {
       });
       core.info(`Branch creation response: ${JSON.stringify(response)}`);
 
-      return response?.data?.ref === reference
+      return response?.data?.ref === reference;
     } else {
       throw Error(error);
     }
@@ -43,7 +43,7 @@ const createOrReplace = async (octokit, context, branchName) => {
   try {
     core.debug(`Creating branch ${branchName}`);
     let isBranchCreated = await create(octokit, context, branchName);
-    core.debug(isBranchCreated);
+
     core.debug("Branch created:", Boolean(isBranchCreated));
     if (!Boolean(isBranchCreated)) {
       core.debug("Deleting the existing branch...");
