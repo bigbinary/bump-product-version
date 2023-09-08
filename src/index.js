@@ -21,11 +21,9 @@ const run = async () => {
 
     core.info("Creating or Replacing branch...");
     await branch.createOrReplace(octokit, context, branchName);
-    await sleep(50);
     
     core.info("Creating a commit...");
     await commit.create(octokit, context, branchName);
-    await sleep(50);
 
     core.info("Creating a PR...");
     const prNumber = await pr.create(octokit, context, branchName);
