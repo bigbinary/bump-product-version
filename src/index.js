@@ -6,8 +6,6 @@ const branch = require("./branch");
 const commit = require("./commit");
 const pr = require("./pr");
 
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-
 const run = async () => {
   try {
     core.info("Bumping gem version...");
@@ -21,14 +19,14 @@ const run = async () => {
 
     core.info("Creating or Replacing branch...");
     await branch.createOrReplace(octokit, context, branchName);
-    
+
     core.info("Creating a commit...");
     await commit.create(octokit, context, branchName);
 
     core.info("Creating a PR...");
     const prNumber = await pr.create(octokit, context, branchName);
 
-    core.debug("PR created:", Boolean(prNumber));
+    core.info("PR created:", Boolean(prNumber));
   } catch (error) {
     core.setFailed(error.message);
   }

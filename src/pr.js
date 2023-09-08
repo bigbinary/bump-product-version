@@ -14,11 +14,15 @@ const create = async (octokit, context, branchName) => {
       ...context.repo,
     });
 
+    core.info(`Created pull request: ${JSON.stringify(response)}`);
+
     await octokit.rest.issues.addLabels({
       ...context.repo,
       issue_number: response.data.number,
       labels: ["skip-version-bump"],
     });
+
+    core.info("Added requirement labels to the PR");
 
     return response.data.number;
   } catch (error) {
