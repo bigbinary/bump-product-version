@@ -26,7 +26,7 @@ const run = async () => {
     core.info("Creating a PR...");
     const prNumber = await pr.create(octokit, context, branchName);
 
-    core.info("PR created:", Boolean(prNumber));
+    core.info(`PR created: ${Boolean(prNumber)}`);
   } catch (error) {
     core.setFailed(error.message);
   }
