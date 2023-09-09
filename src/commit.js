@@ -28,6 +28,7 @@ const getChangedFiles = async (changedFiles) => {
 const create = async (octokit, context, branchName) => {
   const commitMessage = core.getInput("commit_message");
 
+
   try {
     const branch = await octokit.rest.repos.getBranch({
       ...context.repo,
