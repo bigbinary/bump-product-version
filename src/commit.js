@@ -28,7 +28,6 @@ const getChangedFiles = async (changedFiles) => {
 const create = async (octokit, context, branchName) => {
   const commitMessage = core.getInput("commit_message");
 
-
   try {
     const branch = await octokit.rest.repos.getBranch({
       ...context.repo,
@@ -59,11 +58,7 @@ const create = async (octokit, context, branchName) => {
     };
     await exec.exec("git", ["status", "-s"], gitOptions);
 
-    core.info(`Changed files: ${JSON.stringify(changedFiles)}`);
-
     const commitableFiles = await getChangedFiles(changedFiles);
-
-    core.info(`Commitable files: ${JSON.stringify(commitableFiles)}`);
 
     const {
       data: { sha: currentTreeSHA },
@@ -75,8 +70,6 @@ const create = async (octokit, context, branchName) => {
       parents: [commitSHA],
     });
 
-    core.info(`Current tree SHA: ${JSON.stringify(currentTreeSHA)}`);
-
     const {
       data: { sha: newCommitSHA },
     } = await octokit.rest.git.createCommit({
@@ -86,15 +79,13 @@ const create = async (octokit, context, branchName) => {
       parents: [commitSHA],
     });
 
-    core.info(`New commit SHA: ${JSON.stringify(newCommitSHA)}`);
-
     await octokit.rest.git.updateRef({
       ...context.repo,
       sha: newCommitSHA,
       ref: `heads/${branchName}`,
     });
 
-    core.info(`Commit created on the ${branchName} branch!`);
+    core.debug(`Commit created on the ${branchName} branch!`);
   } catch (error) {
     core.setFailed(error.message);
   }

@@ -31,25 +31,25 @@ const bumpGem = async () => {
   }
 
   try {
-    if (!core.isDebug()) {
-      core.info("Installing the gem...");
+    if (core.isDebug()) {
+      core.debug("Installing the gem...");
       await exec.exec("gem install bump_gem_version");
     } else {
       await exec.exec("gem install -q --silent bump_gem_version");
     }
 
-    if (!core.isDebug()) {
-      core.info("Before bump, the gem version was:");
+    if (core.isDebug()) {
+      core.debug("Before bump, the gem version was:");
       await exec.exec("bump_gem_version current");
     }
 
-    core.info("Bumping gem version...");
+    core.debug("Bumping gem version...");
     await exec.exec(`bump_gem_version labels ${prLabels}`);
 
     core.info("Successfully bumped gem version! 🎉");
 
-    if (!core.isDebug()) {
-      core.info("After bump, the gem version is:");
+    if (core.isDebug()) {
+      core.debug("After bump, the gem version is:");
       await exec.exec("bump_gem_version current");
     }
   } catch (error) {
