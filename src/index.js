@@ -17,8 +17,8 @@ const run = async () => {
     const branchName = core.getInput("new_branch");
     const context = github.context;
 
-    core.info("Creating or Replacing branch...");
-    await branch.createOrReplace(octokit, context, branchName);
+    core.info("Replacing branch...");
+    await branch.replace(octokit, context, branchName);
 
     core.info("Creating a commit...");
     await commit.create(octokit, context, branchName);

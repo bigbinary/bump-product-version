@@ -39,13 +39,8 @@ const destroy = async (octokit, context, branch) => {
   }
 };
 
-const createOrReplace = async (octokit, context, branchName) => {
+const replace = async (octokit, context, branchName) => {
   try {
-    core.info(`Creating branch ${branchName}`);
-    core.info(`octokit: ${JSON.stringify({ octokit, context, branchName })}`);
-    let isBranchCreated = await create(octokit, context, branchName);
-
-    core.info(`Branch created: ${Boolean(isBranchCreated)}`);
     core.info("Deleting the existing branch...");
     const isBranchDeleted = await destroy(octokit, context, branchName);
     core.info(`Branch deleted: ${Boolean(isBranchDeleted)}`);
@@ -58,4 +53,4 @@ const createOrReplace = async (octokit, context, branchName) => {
   }
 };
 
-module.exports = { createOrReplace };
+module.exports = { replace };
