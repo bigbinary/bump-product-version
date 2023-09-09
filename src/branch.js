@@ -35,7 +35,7 @@ const destroy = async (octokit, context, branch) => {
     });
     return response;
   } catch (error) {
-    core.setFailed(error.message);
+    core.warning(error.message);
   }
 };
 
