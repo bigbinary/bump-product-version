@@ -88,7 +88,9 @@ const create = async (octokit, context, branchName) => {
     core.debug(`Commit created on the ${branchName} branch!`);
   } catch (error) {
     core.info("its here ***************");
-    core.info(JSON.stringify(error)); // Remove
+    core.info(error); // Remove
+    core.info(error.name); // Remove
+    core.info(error.status); // Remove
     core.setFailed(error.message);
   }
 };
