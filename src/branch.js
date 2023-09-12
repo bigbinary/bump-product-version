@@ -10,6 +10,7 @@ const create = async (octokit, context, branch) => {
       branch,
     });
   } catch (error) {
+    core.info(JSON.stringify(error));
     if (error.name === "HttpError" && error.status === 404) {
       const response = await octokit.rest.git.createRef({
         ref: reference,
