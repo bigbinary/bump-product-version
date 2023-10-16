@@ -97,11 +97,12 @@ const create = async (octokit, context, branchName) => {
       });
 
       core.info(`Commit created on the ${branchName} branch!`);
-      success = true;
+      success = false;
     } catch (error) {
       core.info(error);
       retries++;
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      core.info(`Retry: ${retries}`);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       if (retries == maxRetries) {
         core.setFailed(error.message);
       }
