@@ -1,4 +1,5 @@
 const core = require("@actions/core");
+const { successErrorCode } = require("./utils");
 
 const create = async (octokit, context, branch) => {
   const reference = `refs/heads/${branch}`;
@@ -16,7 +17,8 @@ const create = async (octokit, context, branch) => {
         sha: context.sha,
         ...context.repo,
       });
-      core.info(`Branch creation response: ${JSON.stringify(response)}`);
+      successErrorCode(response?.status) && core.info("Created Branch successfully!");
+      core.debug(`Branch creation response: ${JSON.stringify(response)}`);
 
       return response?.data?.ref === reference;
     } else {

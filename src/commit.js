@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const exec = require("@actions/exec");
 const branch = require("./branch");
+const { successErrorCode } = require("./utils");
 
 const getChangedFiles = async (changedFiles) => {
   const commitableFiles = [];
@@ -44,7 +45,8 @@ const create = async (octokit, context, branchName) => {
         ...context.repo,
         branch: branchName,
       });
-      core.info(`Get branch response: ${JSON.stringify(newBranch)}`);
+      successErrorCode(newBranch?.status) && core.info("Fetched branch successfully!");
+      core.debug(`Get branch response: ${JSON.stringify(newBranch)}`);
 
       const branchSha = newBranch.data.commit.sha;
 
@@ -52,7 +54,8 @@ const create = async (octokit, context, branchName) => {
         ...context.repo,
         sha: branchSha,
       });
-      core.info(`Get commits response: ${JSON.stringify(commits)}`);
+      successErrorCode(commits?.status) && core.info("Fetched commits successfully!");
+      core.debug(`Get commits response: ${JSON.stringify(commits)}`);
 
       const commitSHA = commits.data[0].sha;
 
