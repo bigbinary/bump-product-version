@@ -42,10 +42,10 @@ const destroy = async (octokit, context, branch) => {
 
 const replace = async (octokit, context, branchName) => {
   try {
-    core.debug(`Creating branch ${branchName}`);
+    core.info(`Creating branch ${branchName}`);
     let isBranchCreated = await create(octokit, context, branchName);
 
-    core.debug("Branch created:", Boolean(isBranchCreated));
+    core.info("Branch created:", Boolean(isBranchCreated));
     core.info("Deleting the existing branch...");
     const isBranchDeleted = await destroy(octokit, context, branchName);
     core.info(`Branch deleted: ${Boolean(isBranchDeleted)}`);
