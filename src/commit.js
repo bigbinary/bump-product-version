@@ -103,7 +103,7 @@ const create = async (octokit, context, branchName) => {
       retries++;
       core.info(`Retry: ${retries}`);
       await new Promise((resolve) => setTimeout(resolve, 5000));
-      if (retries == maxRetries) {
+      if (retries === maxRetries) {
         core.setFailed(error.message);
       }
     }
