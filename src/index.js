@@ -2,7 +2,6 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 
 const bumpGem = require("./bump");
-const branch = require("./branch");
 const commit = require("./commit");
 const pr = require("./pr");
 
@@ -16,9 +15,6 @@ const run = async () => {
     const octokit = github.getOctokit(token);
     const branchName = core.getInput("new_branch");
     const context = github.context;
-
-    core.info("Replacing branch...");
-    await branch.replace(octokit, context, branchName);
 
     core.info("Creating a commit...");
     await commit.create(octokit, context, branchName);

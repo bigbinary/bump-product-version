@@ -1,5 +1,6 @@
 const core = require("@actions/core");
 const exec = require("@actions/exec");
+const branch = require("./branch");
 
 const getChangedFiles = async (changedFiles) => {
   const commitableFiles = [];
@@ -29,13 +30,18 @@ const create = async (octokit, context, branchName) => {
   const commitMessage = core.getInput("commit_message");
 
   try {
-    const branch = await octokit.rest.repos.getBranch({
+    core.info("Replacing branch...");
+    await branch.replace(octokit, context, branchName);
+
+    core.info(`Replaced branch`);
+
+    const newBranch = await octokit.rest.repos.getBranch({
       ...context.repo,
       branch: branchName,
     });
-    core.info(`Get branch response: ${JSON.stringify(branch)}`);
+    core.info(`Get branch response: ${JSON.stringify(newBranch)}`);
 
-    const branchSha = branch.data.commit.sha;
+    const branchSha = newBranch.data.commit.sha;
 
     const commits = await octokit.rest.repos.listCommits({
       ...context.repo,
@@ -85,7 +91,7 @@ const create = async (octokit, context, branchName) => {
       ref: `heads/${branchName}`,
     });
 
-    core.debug(`Commit created on the ${branchName} branch!`);
+    core.info(`Commit created on the ${branchName} branch!`);
   } catch (error) {
     core.info("its here ***************");
     core.info(error); // Remove
