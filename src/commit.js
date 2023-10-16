@@ -97,7 +97,7 @@ const create = async (octokit, context, branchName) => {
       });
 
       core.info(`Commit created on the ${branchName} branch!`);
-      success = false;
+      success = true;
     } catch (error) {
       core.info(error);
       retries++;
