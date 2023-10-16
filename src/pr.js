@@ -17,7 +17,7 @@ const create = async (octokit, context, branchName) => {
     await octokit.rest.issues.addLabels({
       ...context.repo,
       issue_number: response.data.number,
-      labels: ["skip-version-bump", "mergepr"],
+      labels: ["skip-version-bump"],
     });
 
     return response.data.number;
