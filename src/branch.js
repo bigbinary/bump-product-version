@@ -1,4 +1,5 @@
 const core = require("@actions/core");
+const { successErrorCode } = require("./utils");
 
 const create = async (octokit, context, branch) => {
   const reference = `refs/heads/${branch}`;
@@ -16,6 +17,8 @@ const create = async (octokit, context, branch) => {
         sha: context.sha,
         ...context.repo,
       });
+      successErrorCode(response?.status) && core.info("Created Branch successfully!");
+      core.debug(`Branch creation response: ${JSON.stringify(response)}`);
 
       return response?.data?.ref === reference;
     } else {
@@ -34,28 +37,26 @@ const destroy = async (octokit, context, branch) => {
     });
     return response;
   } catch (error) {
-    core.setFailed(error.message);
+    core.warning(error.message);
   }
 };
 
-const createOrReplace = async (octokit, context, branchName) => {
+const replace = async (octokit, context, branchName) => {
   try {
-    core.debug(`Creating branch ${branchName}`);
+    core.info(`Creating branch ${branchName}`);
     let isBranchCreated = await create(octokit, context, branchName);
 
-    core.debug("Branch created:", Boolean(isBranchCreated));
-    if (!Boolean(isBranchCreated)) {
-      core.debug("Deleting the existing branch...");
-      const isBranchDeleted = await destroy(octokit, context, branchName);
-      core.debug("Branch deleted:", Boolean(isBranchDeleted));
+    core.info("Branch created:", Boolean(isBranchCreated));
+    core.info("Deleting the existing branch...");
+    const isBranchDeleted = await destroy(octokit, context, branchName);
+    core.info(`Branch deleted: ${Boolean(isBranchDeleted)}`);
 
-      core.debug(`Creating a new branch ${branchName}`);
-      isBranchCreated = await create(octokit, context, branchName);
-      core.debug("Branch created:", Boolean(isBranchCreated));
-    }
+    core.info(`Creating a new branch ${branchName}`);
+    isBranchCreated = await create(octokit, context, branchName);
+    core.info(`Branch created: ${Boolean(isBranchCreated)}`);
   } catch (error) {
     core.setFailed(error.message);
   }
 };
 
-module.exports = { createOrReplace };
+module.exports = { replace };

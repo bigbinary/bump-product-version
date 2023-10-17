@@ -15,3 +15,5 @@ export const getPackageVersion = async () => {
 
   return JSON.parse(packageJson).version;
 }
+
+export const successErrorCode = code => code >= 200 && code < 300;

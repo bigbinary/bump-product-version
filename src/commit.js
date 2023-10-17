@@ -1,5 +1,7 @@
 const core = require("@actions/core");
 const exec = require("@actions/exec");
+const branch = require("./branch");
+const { successErrorCode } = require("./utils");
 
 const getChangedFiles = async (changedFiles) => {
   const commitableFiles = [];
@@ -27,65 +29,87 @@ const getChangedFiles = async (changedFiles) => {
 
 const create = async (octokit, context, branchName) => {
   const commitMessage = core.getInput("commit_message");
+  const maxRetries = 5;
 
-  try {
-    const branch = await octokit.rest.repos.getBranch({
-      ...context.repo,
-      branch: branchName,
-    });
+  let success = false;
+  let retries = 0;
 
-    const branchSha = branch.data.commit.sha;
+  while (!success && retries < maxRetries) {
+    try {
+      core.info("Replacing branch...");
+      await branch.replace(octokit, context, branchName);
 
-    const commits = await octokit.rest.repos.listCommits({
-      ...context.repo,
-      sha: branchSha,
-    });
+      core.info(`Replaced branch`);
 
-    const commitSHA = commits.data[0].sha;
+      const newBranch = await octokit.rest.repos.getBranch({
+        ...context.repo,
+        branch: branchName,
+      });
+      successErrorCode(newBranch?.status) && core.info("Fetched branch successfully!");
+      core.debug(`Get branch response: ${JSON.stringify(newBranch)}`);
 
-    let changedFiles = [];
-    const gitOptions = {};
-    gitOptions.listeners = {
-      stdout: (data) => {
-        const changedFilesString = data.toString();
-        changedFiles = changedFilesString
-          .split("\n")
-          .map((file) => file.split(" ")[2])
-          .filter(Boolean);
-      },
-    };
-    await exec.exec("git", ["status", "-s"], gitOptions);
+      const branchSha = newBranch.data.commit.sha;
 
-    const commitableFiles = await getChangedFiles(changedFiles);
+      const commits = await octokit.rest.repos.listCommits({
+        ...context.repo,
+        sha: branchSha,
+      });
+      successErrorCode(commits?.status) && core.info("Fetched commits successfully!");
+      core.debug(`Get commits response: ${JSON.stringify(commits)}`);
 
-    const {
-      data: { sha: currentTreeSHA },
-    } = await octokit.rest.git.createTree({
-      ...context.repo,
-      tree: commitableFiles,
-      base_tree: commitSHA,
-      message: commitMessage,
-      parents: [commitSHA],
-    });
+      const commitSHA = commits.data[0].sha;
 
-    const {
-      data: { sha: newCommitSHA },
-    } = await octokit.rest.git.createCommit({
-      ...context.repo,
-      tree: currentTreeSHA,
-      message: commitMessage,
-      parents: [commitSHA],
-    });
+      let changedFiles = [];
+      const gitOptions = {};
+      gitOptions.listeners = {
+        stdout: (data) => {
+          const changedFilesString = data.toString();
+          changedFiles = changedFilesString
+            .split("\n")
+            .map((file) => file.split(" ")[2])
+            .filter(Boolean);
+        },
+      };
+      await exec.exec("git", ["status", "-s"], gitOptions);
 
-    await octokit.rest.git.updateRef({
-      ...context.repo,
-      sha: newCommitSHA,
-      ref: `heads/${branchName}`,
-    });
+      const commitableFiles = await getChangedFiles(changedFiles);
 
-    core.debug(`Commit created on the ${branchName} branch!`);
-  } catch (error) {
-    core.setFailed(error.message);
+      const {
+        data: { sha: currentTreeSHA },
+      } = await octokit.rest.git.createTree({
+        ...context.repo,
+        tree: commitableFiles,
+        base_tree: commitSHA,
+        message: commitMessage,
+        parents: [commitSHA],
+      });
+
+      const {
+        data: { sha: newCommitSHA },
+      } = await octokit.rest.git.createCommit({
+        ...context.repo,
+        tree: currentTreeSHA,
+        message: commitMessage,
+        parents: [commitSHA],
+      });
+
+      await octokit.rest.git.updateRef({
+        ...context.repo,
+        sha: newCommitSHA,
+        ref: `heads/${branchName}`,
+      });
+
+      core.info(`Commit created on the ${branchName} branch!`);
+      success = true;
+    } catch (error) {
+      core.info(error);
+      retries++;
+      core.info(`Retry: ${retries}`);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      if (retries === maxRetries) {
+        core.setFailed(error.message);
+      }
+    }
   }
 };
 

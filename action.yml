@@ -42,7 +42,7 @@ outputs:
   version:
     description: "Version of package"
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
   icon: 'chevrons-up'
