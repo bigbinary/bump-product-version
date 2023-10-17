@@ -2,11 +2,8 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 
 const bumpGem = require("./bump");
-const branch = require("./branch");
 const commit = require("./commit");
 const pr = require("./pr");
-
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 const run = async () => {
   try {
@@ -19,18 +16,13 @@ const run = async () => {
     const branchName = core.getInput("new_branch");
     const context = github.context;
 
-    core.info("Creating or Replacing branch...");
-    await branch.createOrReplace(octokit, context, branchName);
-    await sleep(50);
-    
     core.info("Creating a commit...");
     await commit.create(octokit, context, branchName);
-    await sleep(50);
 
     core.info("Creating a PR...");
     const prNumber = await pr.create(octokit, context, branchName);
 
-    core.debug("PR created:", Boolean(prNumber));
+    core.info(`PR created: ${Boolean(prNumber)}`);
   } catch (error) {
     core.setFailed(error.message);
   }
